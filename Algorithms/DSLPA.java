@@ -33,7 +33,7 @@ public class DSLPA {
     public int[] result; // Character-based coding method records experimental community partition(result[10]=1 means The community number of the node with id 10 is 1)
     public  int[] com; // Character-based coding method records common community partition
     public  int c_num = 0; // Number of communities for common community partition
-    
+
     public static void main(String[] args) {
         DSLPA algorithm = new DSLPA();
         algorithm.dsLpa();
@@ -54,14 +54,14 @@ public class DSLPA {
         //Print results
         System.out.println("NMI :"+NMI());
         System.out.println("ARI :"+ARI());
-        System.out.println("Modularity :"+Q(true));//When the same edge appears twice in the data set, the parameter flag is false (such as synthetic data set) otherwise,the parameter flag is true
+        System.out.println("Modularity :"+Q());
         System.out.println("Program running time:" + (endTime - startTime) + "ms");
     }
 
     /*
      * Read data set
      */
-    public void read_real_dataset(ArrayList<Node> node, ArrayList<Edge> edge, String File) { // 读入真实网络数据集
+    public void read_real_dataset(ArrayList<Node> node, ArrayList<Edge> edge, String File) { 
         File file = new File(File);
         String L = "";
         int which = 0;
@@ -537,10 +537,7 @@ public class DSLPA {
         return (double) 2 * (a00 * a11 - a01 * a10) / ((double) (a00 + a01) * (a01 + a11) + (double)(a00 + a10) * (a10 + a11));
     }
 
-    /*When the same edge appears twice in the data set, the parameter flag is false (such as synthetic data set)
-    otherwise,the parameter flag is true
-     */
-    public  double Q(boolean sign) {
+    public  double Q() {
         int[][] ad = new int[node.size()][node.size()];// 邻接矩阵
         int[] du = new int[node.size()];// 存储节点的度
         int[][] membership = new int[node.size()][node.size()];// 节点i,j是否在同一社区，在为1不在为0
@@ -560,7 +557,6 @@ public class DSLPA {
                 }
             }
         }
-        if (sign) {
             for (int i = 0; i < edge.size(); i++) {
                 ad[Integer.parseInt(edge.get(i).source)][Integer.parseInt(edge.get(i).target)] = 1;
                 ad[Integer.parseInt(edge.get(i).target)][Integer.parseInt(edge.get(i).source)] = 1;
@@ -573,20 +569,6 @@ public class DSLPA {
                 }
             }
             q = q / (2 * edge.size());
-        } else {
-            for (int i = 0; i < edge.size(); i++) {
-                ad[Integer.parseInt(edge.get(i).source)][Integer.parseInt(edge.get(i).target)] = 1;
-
-                du[Integer.parseInt(edge.get(i).source)]++;
-
-            }
-            for (int i = 0; i < node.size(); i++) {
-                for (int j = 0; j < node.size(); j++) {
-                    q = q + (ad[i][j] - du[i] * du[j] / (double) (edge.size())) * membership[i][j];
-                }
-            }
-            q = q / (edge.size());
-        }
         return q;
     }
 }
